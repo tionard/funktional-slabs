@@ -1,0 +1,3 @@
+tag=v0.2.0
+asset=functional-slabs-0.2.0.jar
+verified_commit=a61ea9868afab4f582554f9264c6ac53ad0f6515
