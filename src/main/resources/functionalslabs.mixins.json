@@ -5,6 +5,7 @@
   "mixins": [
     "BubbleColumnBlockMixin",
     "EntityMovementMixin",
+    "ItemEntityMixin",
     "PistonStructureResolverMixin"
   ],
   "injectors": {
