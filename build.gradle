@@ -1,0 +1,287 @@
+import groovy.json.JsonOutput
+import org.gradle.api.artifacts.repositories.MavenArtifactRepository
+
+plugins {
+    id 'net.fabricmc.fabric-loom' version "${loom_version}"
+    id 'maven-publish'
+}
+
+version = project.mod_version
+group = project.maven_group
+
+base {
+    archivesName = project.archives_base_name
+}
+
+repositories {
+    maven { url = System.getenv("MAVEN_CENTRAL_URL") ?: "https://repo.maven.apache.org/maven2/" }
+    maven { url = System.getenv("FABRIC_MAVEN_URL") ?: "https://maven.fabricmc.net/" }
+    maven { url = System.getenv("MOJANG_MAVEN_URL") ?: "https://libraries.minecraft.net/" }
+}
+
+// Loom adds these repositories itself. Respect optional mirrors for them as well,
+// which makes local and CI builds work in restricted network environments.
+repositories.withType(MavenArtifactRepository).configureEach { repository ->
+    if (repository.name == "Fabric" && System.getenv("FABRIC_MAVEN_URL")) {
+        repository.url = System.getenv("FABRIC_MAVEN_URL")
+    } else if (repository.name == "Mojang" && System.getenv("MOJANG_MAVEN_URL")) {
+        repository.url = System.getenv("MOJANG_MAVEN_URL")
+    } else if (repository.name == "MavenRepo" && System.getenv("MAVEN_CENTRAL_URL")) {
+        repository.url = System.getenv("MAVEN_CENTRAL_URL")
+    }
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    implementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+}
+
+loom {
+    mods {
+        "functionalslabs" {
+            sourceSet sourceSets.main
+        }
+    }
+}
+
+def slabDefinitions = [
+        [name: "ice_slab", source: "ice", title: "Ice Slab", texture: "ice", translucent: true, silkTouch: true, tool: "pickaxe", family: "generic"],
+        [name: "packed_ice_slab", source: "packed_ice", title: "Packed Ice Slab", texture: "packed_ice", translucent: true, silkTouch: true, tool: "pickaxe", family: "generic"],
+        [name: "blue_ice_slab", source: "blue_ice", title: "Blue Ice Slab", texture: "blue_ice", translucent: true, silkTouch: true, tool: "pickaxe", family: "generic"],
+        [name: "redstone_block_slab", source: "redstone_block", title: "Block of Redstone Slab", texture: "redstone_block", tool: "pickaxe", family: "generic"],
+        [name: "honey_block_slab", source: "honey_block", title: "Honey Block Slab", texture: "honey_block_side", topTexture: "honey_block_top", bottomTexture: "honey_block_bottom", doubleModel: "minecraft:block/honey_block", translucent: true, family: "generic"],
+        [name: "slime_block_slab", source: "slime_block", title: "Slime Block Slab", texture: "slime_block", translucent: true, family: "generic"],
+        [name: "obsidian_slab", source: "obsidian", title: "Obsidian Slab", texture: "obsidian", tool: "pickaxe", tier: "diamond", family: "generic"],
+        [name: "redstone_lamp_slab", source: "redstone_lamp", title: "Redstone Lamp Slab", texture: "redstone_lamp", family: "lamp"],
+        [name: "soul_sand_slab", source: "soul_sand", title: "Soul Sand Slab", texture: "soul_sand", tool: "shovel", family: "generic"],
+        [name: "magma_block_slab", source: "magma_block", title: "Magma Block Slab", texture: "magma", tool: "pickaxe", family: "generic"],
+        [name: "copper_bulb_slab", source: "copper_bulb", title: "Copper Bulb Slab", texture: "copper_bulb", tool: "pickaxe", family: "bulb"],
+        [name: "exposed_copper_bulb_slab", source: "exposed_copper_bulb", title: "Exposed Copper Bulb Slab", texture: "exposed_copper_bulb", tool: "pickaxe", family: "bulb"],
+        [name: "weathered_copper_bulb_slab", source: "weathered_copper_bulb", title: "Weathered Copper Bulb Slab", texture: "weathered_copper_bulb", tool: "pickaxe", family: "bulb"],
+        [name: "oxidized_copper_bulb_slab", source: "oxidized_copper_bulb", title: "Oxidized Copper Bulb Slab", texture: "oxidized_copper_bulb", tool: "pickaxe", family: "bulb"],
+        [name: "waxed_copper_bulb_slab", source: "waxed_copper_bulb", title: "Waxed Copper Bulb Slab", texture: "copper_bulb", tool: "pickaxe", family: "bulb", waxedFrom: "copper_bulb_slab"],
+        [name: "waxed_exposed_copper_bulb_slab", source: "waxed_exposed_copper_bulb", title: "Waxed Exposed Copper Bulb Slab", texture: "exposed_copper_bulb", tool: "pickaxe", family: "bulb", waxedFrom: "exposed_copper_bulb_slab"],
+        [name: "waxed_weathered_copper_bulb_slab", source: "waxed_weathered_copper_bulb", title: "Waxed Weathered Copper Bulb Slab", texture: "weathered_copper_bulb", tool: "pickaxe", family: "bulb", waxedFrom: "weathered_copper_bulb_slab"],
+        [name: "waxed_oxidized_copper_bulb_slab", source: "waxed_oxidized_copper_bulb", title: "Waxed Oxidized Copper Bulb Slab", texture: "oxidized_copper_bulb", tool: "pickaxe", family: "bulb", waxedFrom: "oxidized_copper_bulb_slab"]
+]
+
+def generatedResourcesDir = layout.buildDirectory.dir("generated/functionalSlabResources")
+
+sourceSets.main.resources.srcDir(generatedResourcesDir)
+
+tasks.register("generateFunctionalSlabResources") {
+    inputs.property("slabDefinitions", slabDefinitions)
+    outputs.dir(generatedResourcesDir)
+
+    doLast {
+        File root = generatedResourcesDir.get().asFile
+        delete root
+
+        def writeJson = { String relativePath, Object value ->
+            File output = new File(root, relativePath)
+            output.parentFile.mkdirs()
+            output.text = JsonOutput.prettyPrint(JsonOutput.toJson(value)) + System.lineSeparator()
+        }
+
+        def blockModel = { Map slab, String texture, String slabType ->
+            def model = slabType == "double" && slab.doubleModel
+                    ? [parent: slab.doubleModel]
+                    : slabType == "double"
+                    ? [parent: "minecraft:block/cube_all", textures: [all: "minecraft:block/${texture}"]]
+                    : [
+                            parent: slabType == "top" ? "minecraft:block/slab_top" : "minecraft:block/slab",
+                            textures: [
+                                    bottom: "minecraft:block/${slab.bottomTexture ?: texture}",
+                                    top   : "minecraft:block/${slab.topTexture ?: texture}",
+                                    side  : "minecraft:block/${texture}"
+                            ]
+                    ]
+            if (slab.translucent == true) {
+                model.render_type = "minecraft:translucent"
+            }
+            return model
+        }
+
+        def modelPath = { String blockName, String stateSuffix, String slabType ->
+            String suffix = stateSuffix ? "_${stateSuffix}" : ""
+            String typeSuffix = switch (slabType) {
+                case "top" -> "_top"
+                case "double" -> "_double"
+                default -> ""
+            }
+            return "${blockName}${suffix}${typeSuffix}"
+        }
+
+        def writeModelFamily = { Map slab, String stateSuffix, String texture ->
+            ["bottom", "top", "double"].each { slabType ->
+                writeJson(
+                        "assets/functionalslabs/models/block/${modelPath(slab.name, stateSuffix, slabType)}.json",
+                        blockModel(slab, texture, slabType)
+                )
+            }
+        }
+
+        def language = [:]
+        def allSlabs = []
+        def pickaxeSlabs = []
+        def shovelSlabs = []
+        def diamondSlabs = []
+
+        slabDefinitions.each { slab ->
+            String blockId = "functionalslabs:${slab.name}"
+            allSlabs << blockId
+            language["block.functionalslabs.${slab.name}"] = slab.title
+
+            if (slab.tool == "pickaxe") {
+                pickaxeSlabs << blockId
+            } else if (slab.tool == "shovel") {
+                shovelSlabs << blockId
+            }
+            if (slab.tier == "diamond") {
+                diamondSlabs << blockId
+            }
+
+            def variants = [:]
+            if (slab.family == "lamp") {
+                [false, true].each { lit ->
+                    String stateSuffix = lit ? "lit" : ""
+                    String texture = lit ? "redstone_lamp_on" : "redstone_lamp"
+                    writeModelFamily(slab, stateSuffix, texture)
+                    ["bottom", "top", "double"].each { slabType ->
+                        variants["lit=${lit},type=${slabType}"] = [
+                                model: "functionalslabs:block/${modelPath(slab.name, stateSuffix, slabType)}"
+                        ]
+                    }
+                }
+            } else if (slab.family == "bulb") {
+                [[false, false, ""], [false, true, "powered"], [true, false, "lit"], [true, true, "lit_powered"]].each { values ->
+                    boolean lit = values[0]
+                    boolean powered = values[1]
+                    String stateSuffix = values[2]
+                    String texture = slab.texture + (stateSuffix ? "_${stateSuffix}" : "")
+                    writeModelFamily(slab, stateSuffix, texture)
+                    ["bottom", "top", "double"].each { slabType ->
+                        variants["lit=${lit},powered=${powered},type=${slabType}"] = [
+                                model: "functionalslabs:block/${modelPath(slab.name, stateSuffix, slabType)}"
+                        ]
+                    }
+                }
+            } else {
+                writeModelFamily(slab, "", slab.texture)
+                ["bottom", "top", "double"].each { slabType ->
+                    variants["type=${slabType}"] = [
+                            model: "functionalslabs:block/${modelPath(slab.name, "", slabType)}"
+                    ]
+                }
+            }
+
+            writeJson("assets/functionalslabs/blockstates/${slab.name}.json", [variants: variants])
+            writeJson("assets/functionalslabs/items/${slab.name}.json", [
+                    model: [type: "minecraft:model", model: "functionalslabs:block/${slab.name}"]
+            ])
+
+            writeJson("data/functionalslabs/recipe/${slab.name}.json", [
+                    type: "minecraft:crafting_shaped",
+                    category: "building",
+                    key: ["#": "minecraft:${slab.source}"],
+                    pattern: ["###"],
+                    result: [count: 6, id: blockId]
+            ])
+            writeJson("data/functionalslabs/recipe/${slab.name}_from_${slab.source}_stonecutting.json", [
+                    type: "minecraft:stonecutting",
+                    ingredient: "minecraft:${slab.source}",
+                    result: [count: 2, id: blockId]
+            ])
+
+            if (slab.waxedFrom) {
+                writeJson("data/functionalslabs/recipe/${slab.name}_from_honeycomb.json", [
+                        type: "minecraft:crafting_shapeless",
+                        category: "building",
+                        group: slab.name,
+                        ingredients: ["functionalslabs:${slab.waxedFrom}", "minecraft:honeycomb"],
+                        result: [id: blockId]
+                ])
+            }
+
+            def entryFunctions = [
+                    [
+                            function: "minecraft:set_count",
+                            count: 2.0,
+                            conditions: [[
+                                    condition: "minecraft:block_state_property",
+                                    block: blockId,
+                                    properties: [type: "double"]
+                            ]]
+                    ],
+                    [function: "minecraft:explosion_decay"]
+            ]
+            def pool = [
+                    rolls: 1.0,
+                    entries: [[type: "minecraft:item", name: blockId, functions: entryFunctions]]
+            ]
+            if (slab.silkTouch == true) {
+                pool.conditions = [[
+                        condition: "minecraft:match_tool",
+                        predicate: [predicates: [
+                                "minecraft:enchantments": [[
+                                        enchantments: "minecraft:silk_touch",
+                                        levels: [min: 1]
+                                ]]
+                        ]]
+                ]]
+            }
+            writeJson("data/functionalslabs/loot_table/blocks/${slab.name}.json", [
+                    type: "minecraft:block",
+                    pools: [pool],
+                    random_sequence: "functionalslabs:blocks/${slab.name}"
+            ])
+        }
+
+        writeJson("assets/functionalslabs/lang/en_us.json", language)
+        writeJson("data/minecraft/tags/block/slabs.json", [replace: false, values: allSlabs])
+        writeJson("data/minecraft/tags/item/slabs.json", [replace: false, values: allSlabs])
+        writeJson("data/minecraft/tags/block/mineable/pickaxe.json", [replace: false, values: pickaxeSlabs])
+        writeJson("data/minecraft/tags/block/mineable/shovel.json", [replace: false, values: shovelSlabs])
+        writeJson("data/minecraft/tags/block/needs_diamond_tool.json", [replace: false, values: diamondSlabs])
+        writeJson("data/minecraft/tags/block/ice.json", [replace: false, values: [
+                "functionalslabs:ice_slab",
+                "functionalslabs:packed_ice_slab",
+                "functionalslabs:blue_ice_slab"
+        ]])
+        writeJson("data/minecraft/tags/block/enables_bubble_column_push_up.json", [replace: false, values: ["functionalslabs:soul_sand_slab"]])
+        writeJson("data/minecraft/tags/block/enables_bubble_column_drag_down.json", [replace: false, values: ["functionalslabs:magma_block_slab"]])
+        writeJson("data/minecraft/tags/block/soul_speed_blocks.json", [replace: false, values: ["functionalslabs:soul_sand_slab"]])
+        writeJson("data/minecraft/tags/block/soul_fire_base_blocks.json", [replace: false, values: ["functionalslabs:soul_sand_slab"]])
+        writeJson("data/minecraft/tags/block/supports_nether_wart.json", [replace: false, values: ["functionalslabs:soul_sand_slab"]])
+        writeJson("data/functionalslabs/tags/block/slime_blocks.json", [replace: false, values: ["minecraft:slime_block", "functionalslabs:slime_block_slab"]])
+        writeJson("data/functionalslabs/tags/block/honey_blocks.json", [replace: false, values: ["minecraft:honey_block", "functionalslabs:honey_block_slab"]])
+    }
+}
+
+tasks.named("processResources") {
+    dependsOn tasks.named("generateFunctionalSlabResources")
+    inputs.property "version", project.version
+
+    filesMatching("fabric.mod.json") {
+        expand "version": project.version
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.release = 25
+}
+
+java {
+    withSourcesJar()
+}
+
+tasks.named("sourcesJar") {
+    dependsOn tasks.named("generateFunctionalSlabResources")
+}
+
+jar {
+    from("LICENSE") {
+        rename { "${it}_${project.archives_base_name}" }
+    }
+}

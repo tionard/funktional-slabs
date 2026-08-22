@@ -1,0 +1,11 @@
+{
+  "required": true,
+  "package": "com.github.tionard.functionalslabs.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "mixins": [
+    "PistonStructureResolverMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
