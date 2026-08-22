@@ -26,7 +26,11 @@ public final class RedstoneLampSlabBlock extends SlabBlock {
                 ? null
                 : state.setValue(
                         RedstoneLampBlock.LIT,
-                        context.getLevel().hasNeighborSignal(context.getClickedPos())
+                        FunctionalSlabGeometry.hasTouchingNeighborSignal(
+                                state,
+                                context.getLevel(),
+                                context.getClickedPos()
+                        )
                 );
     }
 
@@ -43,7 +47,7 @@ public final class RedstoneLampSlabBlock extends SlabBlock {
             return;
         }
         boolean lit = state.getValue(RedstoneLampBlock.LIT);
-        if (lit == level.hasNeighborSignal(pos)) {
+        if (lit == FunctionalSlabGeometry.hasTouchingNeighborSignal(state, level, pos)) {
             return;
         }
         if (lit) {
@@ -55,7 +59,8 @@ public final class RedstoneLampSlabBlock extends SlabBlock {
 
     @Override
     protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
-        if (state.getValue(RedstoneLampBlock.LIT) && !level.hasNeighborSignal(pos)) {
+        if (state.getValue(RedstoneLampBlock.LIT)
+                && !FunctionalSlabGeometry.hasTouchingNeighborSignal(state, level, pos)) {
             level.setBlock(pos, state.cycle(RedstoneLampBlock.LIT), 2);
         }
     }

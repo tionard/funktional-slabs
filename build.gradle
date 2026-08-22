@@ -49,7 +49,7 @@ def slabDefinitions = [
         [name: "ice_slab", source: "ice", title: "Ice Slab", texture: "ice", translucent: true, silkTouch: true, tool: "pickaxe", family: "generic"],
         [name: "packed_ice_slab", source: "packed_ice", title: "Packed Ice Slab", texture: "packed_ice", translucent: true, silkTouch: true, tool: "pickaxe", family: "generic"],
         [name: "blue_ice_slab", source: "blue_ice", title: "Blue Ice Slab", texture: "blue_ice", translucent: true, silkTouch: true, tool: "pickaxe", family: "generic"],
-        [name: "redstone_block_slab", source: "redstone_block", title: "Block of Redstone Slab", texture: "redstone_block", tool: "pickaxe", family: "generic"],
+        [name: "redstone_block_slab", source: "redstone_block", title: "Redstone Slab", texture: "redstone_block", tool: "pickaxe", family: "generic"],
         [name: "honey_block_slab", source: "honey_block", title: "Honey Block Slab", texture: "honey_block_side", topTexture: "honey_block_top", bottomTexture: "honey_block_bottom", doubleModel: "minecraft:block/honey_block", translucent: true, family: "generic"],
         [name: "slime_block_slab", source: "slime_block", title: "Slime Block Slab", texture: "slime_block", translucent: true, family: "generic"],
         [name: "obsidian_slab", source: "obsidian", title: "Obsidian Slab", texture: "obsidian", tool: "pickaxe", tier: "diamond", family: "generic"],
@@ -256,6 +256,10 @@ tasks.register("generateFunctionalSlabResources") {
         writeJson("data/minecraft/tags/block/supports_nether_wart.json", [replace: false, values: ["functionalslabs:soul_sand_slab"]])
         writeJson("data/functionalslabs/tags/block/slime_blocks.json", [replace: false, values: ["minecraft:slime_block", "functionalslabs:slime_block_slab"]])
         writeJson("data/functionalslabs/tags/block/honey_blocks.json", [replace: false, values: ["minecraft:honey_block", "functionalslabs:honey_block_slab"]])
+        writeJson("data/functionalslabs/tags/block/bubble_column_sources.json", [replace: false, values: [
+                "functionalslabs:soul_sand_slab",
+                "functionalslabs:magma_block_slab"
+        ]])
     }
 }
 
