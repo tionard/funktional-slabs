@@ -18,12 +18,12 @@ Slabs use the normal vanilla recipe of three blocks in a horizontal row for six 
 ## Preserved behavior
 
 - Ice slipperiness, Silk Touch drops, and regular ice melting
-- Constant redstone power from redstone block slabs
-- Honey slowdown, wall sliding, fall cushioning, and piston adhesion
-- Slime bouncing, movement slowdown, and piston adhesion
+- Constant redstone power from faces occupied by redstone slabs
+- Honey slowdown, wall sliding, fall cushioning, and contact-aware piston adhesion
+- Slime bouncing, movement slowdown, and contact-aware piston adhesion
 - Magma damage and downward bubble columns
 - Soul sand slowdown, upward bubble columns, Soul Speed, soul fire, and nether wart support
-- Redstone lamp power response and delayed shutoff
+- Redstone lamp and copper bulb power response only through occupied faces
 - Copper bulb toggling, comparator output, oxidation, waxing, scraping, and light levels
 
 ## Development
@@ -34,4 +34,4 @@ The project targets Java 25, Fabric Loader 0.19.3, Fabric API 0.156.0+26.2, and 
 ./gradlew build
 ```
 
-The release JAR is written to `build/libs/functional-slabs-0.1.0.jar`.
+The release JAR is written to `build/libs/functional-slabs-<version>.jar`.

@@ -9,6 +9,7 @@ import net.minecraft.world.level.block.Block;
 public final class FunctionalSlabTags {
     public static final TagKey<Block> SLIME_BLOCKS = blockTag("slime_blocks");
     public static final TagKey<Block> HONEY_BLOCKS = blockTag("honey_blocks");
+    public static final TagKey<Block> BUBBLE_COLUMN_SOURCES = blockTag("bubble_column_sources");
 
     private FunctionalSlabTags() {
     }

@@ -5,6 +5,8 @@ import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.CopperBulbBlock;
@@ -38,6 +40,20 @@ public class CopperBulbSlabBlock extends SlabBlock {
     }
 
     @Override
+    public void setPlacedBy(
+            Level level,
+            BlockPos pos,
+            BlockState state,
+            LivingEntity placer,
+            ItemStack stack
+    ) {
+        super.setPlacedBy(level, pos, state, placer, stack);
+        if (level instanceof ServerLevel serverLevel) {
+            checkAndFlip(serverLevel.getBlockState(pos), serverLevel, pos);
+        }
+    }
+
+    @Override
     protected void neighborChanged(
             BlockState state,
             Level level,
@@ -52,7 +68,7 @@ public class CopperBulbSlabBlock extends SlabBlock {
     }
 
     private void checkAndFlip(BlockState state, ServerLevel level, BlockPos pos) {
-        boolean signal = level.hasNeighborSignal(pos);
+        boolean signal = FunctionalSlabGeometry.hasTouchingNeighborSignal(state, level, pos);
         if (signal == state.getValue(CopperBulbBlock.POWERED)) {
             return;
         }

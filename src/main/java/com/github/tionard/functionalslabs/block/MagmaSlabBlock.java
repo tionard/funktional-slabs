@@ -4,13 +4,12 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 
-public final class MagmaSlabBlock extends SlabBlock {
+public final class MagmaSlabBlock extends BubbleColumnSlabBlock {
     public MagmaSlabBlock(BlockBehaviour.Properties properties) {
-        super(properties);
+        super(properties, true);
     }
 
     @Override

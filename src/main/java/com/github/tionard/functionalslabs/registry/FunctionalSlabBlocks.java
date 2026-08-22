@@ -8,6 +8,7 @@ import com.github.tionard.functionalslabs.block.MagmaSlabBlock;
 import com.github.tionard.functionalslabs.block.RedstoneLampSlabBlock;
 import com.github.tionard.functionalslabs.block.RedstoneSlabBlock;
 import com.github.tionard.functionalslabs.block.SlimeSlabBlock;
+import com.github.tionard.functionalslabs.block.SoulSandSlabBlock;
 import com.github.tionard.functionalslabs.block.WeatheringCopperBulbSlabBlock;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -40,7 +41,7 @@ public final class FunctionalSlabBlocks {
     public static final Block SLIME_BLOCK_SLAB = register("slime_block_slab", Blocks.SLIME_BLOCK, SlimeSlabBlock::new);
     public static final Block OBSIDIAN_SLAB = register("obsidian_slab", Blocks.OBSIDIAN, SlabBlock::new);
     public static final Block REDSTONE_LAMP_SLAB = register("redstone_lamp_slab", Blocks.REDSTONE_LAMP, RedstoneLampSlabBlock::new);
-    public static final Block SOUL_SAND_SLAB = register("soul_sand_slab", Blocks.SOUL_SAND, SlabBlock::new);
+    public static final Block SOUL_SAND_SLAB = register("soul_sand_slab", Blocks.SOUL_SAND, SoulSandSlabBlock::new);
     public static final Block MAGMA_BLOCK_SLAB = register("magma_block_slab", Blocks.MAGMA_BLOCK, MagmaSlabBlock::new);
 
     public static final Block COPPER_BULB_SLAB = registerWeatheringBulb("copper_bulb_slab", WeatheringCopper.WeatherState.UNAFFECTED);
@@ -100,7 +101,10 @@ public final class FunctionalSlabBlocks {
         Registry.register(BuiltInRegistries.BLOCK, blockKey, block);
 
         ResourceKey<Item> itemKey = ResourceKey.create(Registries.ITEM, blockKey.identifier());
-        BlockItem item = new BlockItem(block, new Item.Properties().setId(itemKey));
+        BlockItem item = new BlockItem(
+                block,
+                new Item.Properties().setId(itemKey).useBlockDescriptionPrefix()
+        );
         Registry.register(BuiltInRegistries.ITEM, itemKey, item);
         item.registerBlocks(Item.BY_BLOCK, item);
 
