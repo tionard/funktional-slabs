@@ -4,9 +4,11 @@
   "compatibilityLevel": "JAVA_25",
   "mixins": [
     "BubbleColumnBlockMixin",
+    "CampfireBlockMixin",
     "EntityMovementMixin",
     "ItemEntityMixin",
-    "PistonStructureResolverMixin"
+    "PistonStructureResolverMixin",
+    "TargetBlockInvoker"
   ],
   "injectors": {
     "defaultRequire": 1

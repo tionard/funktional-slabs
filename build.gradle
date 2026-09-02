@@ -56,6 +56,8 @@ def slabDefinitions = [
         [name: "redstone_lamp_slab", source: "redstone_lamp", title: "Redstone Lamp Slab", texture: "redstone_lamp", family: "lamp"],
         [name: "soul_sand_slab", source: "soul_sand", title: "Soul Sand Slab", texture: "soul_sand", tool: "shovel", family: "generic"],
         [name: "magma_block_slab", source: "magma_block", title: "Magma Block Slab", texture: "magma", tool: "pickaxe", family: "generic"],
+        [name: "hay_bale_slab", source: "hay_block", title: "Hay Bale Slab", texture: "hay_block_side", topTexture: "hay_block_top", bottomTexture: "hay_block_top", doubleModel: "minecraft:block/hay_block", tool: "hoe", family: "generic"],
+        [name: "target_slab", source: "target", title: "Target Slab", texture: "target_side", topTexture: "target_top", bottomTexture: "target_top", doubleModel: "minecraft:block/target", tool: "hoe", family: "target"],
         [name: "copper_bulb_slab", source: "copper_bulb", title: "Copper Bulb Slab", texture: "copper_bulb", tool: "pickaxe", family: "bulb"],
         [name: "exposed_copper_bulb_slab", source: "exposed_copper_bulb", title: "Exposed Copper Bulb Slab", texture: "exposed_copper_bulb", tool: "pickaxe", family: "bulb"],
         [name: "weathered_copper_bulb_slab", source: "weathered_copper_bulb", title: "Weathered Copper Bulb Slab", texture: "weathered_copper_bulb", tool: "pickaxe", family: "bulb"],
@@ -126,6 +128,7 @@ tasks.register("generateFunctionalSlabResources") {
         def allSlabs = []
         def pickaxeSlabs = []
         def shovelSlabs = []
+        def hoeSlabs = []
         def diamondSlabs = []
 
         slabDefinitions.each { slab ->
@@ -137,6 +140,8 @@ tasks.register("generateFunctionalSlabResources") {
                 pickaxeSlabs << blockId
             } else if (slab.tool == "shovel") {
                 shovelSlabs << blockId
+            } else if (slab.tool == "hoe") {
+                hoeSlabs << blockId
             }
             if (slab.tier == "diamond") {
                 diamondSlabs << blockId
@@ -164,6 +169,15 @@ tasks.register("generateFunctionalSlabResources") {
                     ["bottom", "top", "double"].each { slabType ->
                         variants["lit=${lit},powered=${powered},type=${slabType}"] = [
                                 model: "functionalslabs:block/${modelPath(slab.name, stateSuffix, slabType)}"
+                        ]
+                    }
+                }
+            } else if (slab.family == "target") {
+                writeModelFamily(slab, "", slab.texture)
+                (0..15).each { power ->
+                    ["bottom", "top", "double"].each { slabType ->
+                        variants["power=${power},type=${slabType}"] = [
+                                model: "functionalslabs:block/${modelPath(slab.name, "", slabType)}"
                         ]
                     }
                 }
@@ -243,6 +257,7 @@ tasks.register("generateFunctionalSlabResources") {
         writeJson("data/minecraft/tags/item/slabs.json", [replace: false, values: allSlabs])
         writeJson("data/minecraft/tags/block/mineable/pickaxe.json", [replace: false, values: pickaxeSlabs])
         writeJson("data/minecraft/tags/block/mineable/shovel.json", [replace: false, values: shovelSlabs])
+        writeJson("data/minecraft/tags/block/mineable/hoe.json", [replace: false, values: hoeSlabs])
         writeJson("data/minecraft/tags/block/needs_diamond_tool.json", [replace: false, values: diamondSlabs])
         writeJson("data/minecraft/tags/block/ice.json", [replace: false, values: [
                 "functionalslabs:ice_slab",
@@ -256,6 +271,7 @@ tasks.register("generateFunctionalSlabResources") {
         writeJson("data/minecraft/tags/block/supports_nether_wart.json", [replace: false, values: ["functionalslabs:soul_sand_slab"]])
         writeJson("data/functionalslabs/tags/block/slime_blocks.json", [replace: false, values: ["minecraft:slime_block", "functionalslabs:slime_block_slab"]])
         writeJson("data/functionalslabs/tags/block/honey_blocks.json", [replace: false, values: ["minecraft:honey_block", "functionalslabs:honey_block_slab"]])
+        writeJson("data/functionalslabs/tags/block/signal_fire_base_blocks.json", [replace: false, values: ["functionalslabs:hay_bale_slab"]])
         writeJson("data/functionalslabs/tags/block/bubble_column_sources.json", [replace: false, values: [
                 "functionalslabs:soul_sand_slab",
                 "functionalslabs:magma_block_slab"
