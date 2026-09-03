@@ -2,6 +2,7 @@ package com.github.tionard.functionalslabs.registry;
 
 import com.github.tionard.functionalslabs.FunctionalSlabs;
 import com.github.tionard.functionalslabs.block.CopperBulbSlabBlock;
+import com.github.tionard.functionalslabs.block.HayBaleSlabBlock;
 import com.github.tionard.functionalslabs.block.HoneySlabBlock;
 import com.github.tionard.functionalslabs.block.IceSlabBlock;
 import com.github.tionard.functionalslabs.block.MagmaSlabBlock;
@@ -9,6 +10,7 @@ import com.github.tionard.functionalslabs.block.RedstoneLampSlabBlock;
 import com.github.tionard.functionalslabs.block.RedstoneSlabBlock;
 import com.github.tionard.functionalslabs.block.SlimeSlabBlock;
 import com.github.tionard.functionalslabs.block.SoulSandSlabBlock;
+import com.github.tionard.functionalslabs.block.TargetSlabBlock;
 import com.github.tionard.functionalslabs.block.WeatheringCopperBulbSlabBlock;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -43,6 +45,8 @@ public final class FunctionalSlabBlocks {
     public static final Block REDSTONE_LAMP_SLAB = register("redstone_lamp_slab", Blocks.REDSTONE_LAMP, RedstoneLampSlabBlock::new);
     public static final Block SOUL_SAND_SLAB = register("soul_sand_slab", Blocks.SOUL_SAND, SoulSandSlabBlock::new);
     public static final Block MAGMA_BLOCK_SLAB = register("magma_block_slab", Blocks.MAGMA_BLOCK, MagmaSlabBlock::new);
+    public static final Block HAY_BALE_SLAB = register("hay_bale_slab", Blocks.HAY_BLOCK, HayBaleSlabBlock::new);
+    public static final Block TARGET_SLAB = register("target_slab", Blocks.TARGET, TargetSlabBlock::new);
 
     public static final Block COPPER_BULB_SLAB = registerWeatheringBulb("copper_bulb_slab", WeatheringCopper.WeatherState.UNAFFECTED);
     public static final Block EXPOSED_COPPER_BULB_SLAB = registerWeatheringBulb("exposed_copper_bulb_slab", WeatheringCopper.WeatherState.EXPOSED);

@@ -11,6 +11,8 @@ Functional Slabs is a Fabric mod for Minecraft Java 26.2. It adds half-height ve
 - Redstone lamp
 - Soul sand
 - Magma block
+- Hay bale
+- Target block
 - Copper bulbs in every oxidation stage, including waxed variants
 
 Slabs use the normal vanilla recipe of three blocks in a horizontal row for six slabs. Every slab also has a stonecutter recipe that turns one source block into two slabs.
@@ -24,6 +26,8 @@ Slabs use the normal vanilla recipe of three blocks in a horizontal row for six 
 - Magma damage and downward bubble columns
 - Soul sand slowdown, upward bubble columns, Soul Speed, soul fire, and nether wart support
 - Redstone lamp and copper bulb power response only through occupied faces
+- Hay bale fall cushioning and campfire signal smoke when the slab touches the campfire
+- Projectile-sensitive target output, with power limited to faces occupied by the slab
 - Copper bulb toggling, comparator output, oxidation, waxing, scraping, and light levels
 
 ## Development
